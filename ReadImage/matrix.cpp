@@ -8,17 +8,17 @@ ImageMatrix::ImageMatrix(int _height, int _width)
 	height = _height;
 	width = _width;
 
-	//arr = (double**)malloc(sizeof(double*)*height);
-	//for (int j = 0; j < height; j++)
-	//{
-	//	arr[j] = (double*)malloc(sizeof(double)*width);
-	//}
-	
-	arr = new double *[width];
+	arr = (double**)malloc(sizeof(double*)*height);
 	for (int j = 0; j < height; j++)
 	{
-		arr[j] = new double[height];
+		arr[j] = (double*)malloc(sizeof(double)*width);
 	}
+	
+	//arr = new double *[width];
+	//for (int j = 0; j < height; j++)
+	//{
+	//	arr[j] = new double[height];
+	//}
 
 	for (int i = 0; i < height; ++i)
 	{
@@ -197,7 +197,7 @@ ImageMatrix* ImageMatrix::select(int num)
 	{
 		for (int i = 0; i < height; ++i)
 		{
-			for (int j = 0; j < width; ++j)
+			for (int j = width-1; j >=0; --j)
 			{
 				if (j == 0)
 				{
@@ -229,7 +229,7 @@ ImageMatrix* ImageMatrix::select(int num)
 	}
 	else if (num == 4)//1,1~n-1
 	{
-		for (int i = 0; i < height; ++i)
+		for (int i = height-1; i >= 0; --i)
 		{
 			for (int j = 0; j < width; ++j)
 			{

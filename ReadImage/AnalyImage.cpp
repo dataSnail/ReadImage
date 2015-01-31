@@ -115,7 +115,7 @@ int main(){
 			(*(imagedata + i * width + j)).blue = gray;
 			(*(imagedata + i * width + j)).green = gray;
 			(*(imagedata + i * width + j)).red = gray;
-			imageArr.putVal(height-1-i, j, double(gray));
+			imageArr.putVal(height - 1 - i, j, double(gray));
 		}
 	}
 
@@ -167,9 +167,9 @@ int main(){
 	//float c2 = sum_out / count_out;
 
 	//==========================================计算
-	
+
 	ImageMatrix* u = new ImageMatrix(height, width);
-	
+
 
 
 
@@ -177,7 +177,7 @@ int main(){
 	{
 		for (int j = 1; j <= width; ++j)
 		{
-			u->putVal(i-1, j-1, (r - sqrt((i - xc)*(i - xc) + (j - yc)*(j - yc))));
+			u->putVal(i - 1, j - 1, (r - sqrt((i - xc)*(i - xc) + (j - yc)*(j - yc))));
 		}
 	}
 
@@ -185,7 +185,7 @@ int main(){
 
 
 
-	
+
 	ImageMatrix *C = new ImageMatrix(height, width);
 	//C.Init(height, width);
 	ImageMatrix *m = new ImageMatrix(height, width);
@@ -215,10 +215,13 @@ int main(){
 	ImageMatrix *temp3 = new ImageMatrix(height, width);
 	ImageMatrix *temp4 = new ImageMatrix(height, width);
 	//=====================================/////////////////////////////////////////////////////////////////////////////
-	for (int ii = 0; ii < 1;ii++)
+	for (int ii = 1; ii <= 1000; ii++)
 	{
-		//std::cout << ii << std::endl;
-		
+		if (ii % 10 == 0)
+		{
+			std::cout << ii << std::endl;
+		}
+
 		//0.5*(1+(2/pi)*atan(u/epsilon));
 		//计算Hu
 
@@ -226,7 +229,7 @@ int main(){
 		{
 			for (int j = 0; j < width; ++j)
 			{
-				Hu->putVal(i, j, (0.5*(1 + (2 / PI)*atan(u->getVal(i, j)/epsilon))));
+				Hu->putVal(i, j, (0.5*(1 + (2 / PI)*atan(u->getVal(i, j) / epsilon))));
 			}
 		}
 
@@ -255,21 +258,24 @@ int main(){
 
 		//1./sqrt();
 		//eps+(u(:,[2:y_center,y_center])-u).^2+0.25*(u([2:x_center,x_center],:)-u([1,1:x_center-1],:)).^2
-		
+
 		u->copy(temp0);
 		u->copy(temp1);
 		u->copy(temp2);
 		//(u.select(1).matrixMinues(u).matrixMul(u.select(1).matrixMinues(u)))
-		temp0->printMatrix();
+		//temp0->printMatrix();
 		temp0->select(1)->matrixMinues(*u);
 		temp0->matrixMul(*temp0);
 		//temp0->printMatrix();
 		//(u.select(3).matrixMinues(u.select(4)).matrixMul(u.select(3).matrixMinues(u.select(4))))
-		temp1->select(3)->matrixMinues(*(temp2->select(4)));
+		//temp2->printMatrix();
+		(temp1->select(3))->matrixMinues(*(temp2->select(4)));
+		//temp1->printMatrix();
+		//temp2->printMatrix();
 		temp1->matrixMul(*temp1);
-
+		//temp1->printMatrix();
 		(((temp0->matrixPlus(*(temp1->intMul(0.25))))->intPlus(MIN_ZERO))->matrixsqrt()->intDiv(1, 1))->copy(C1);
-		C1->printMatrix();
+		//C1->printMatrix();
 		//u.printMatrix();
 		//u.select(1).printMatrix();
 
@@ -285,7 +291,7 @@ int main(){
 		temp1->matrixMul(*temp1);
 
 		(((temp0->matrixPlus(*(temp1->intMul(0.25))))->intPlus(MIN_ZERO))->matrixsqrt()->intDiv(1, 1))->copy(C2);
-		//C2.printMatrix();
+		//C2->printMatrix();
 
 		//C_3=1./sqrt(eps+(u([2:x_center,x_center],:)-u).^2+0.25*(u(:,[2:y_center,y_center])-u(:,[1,1:y_center-1])).^2);
 		u->copy(temp0);
@@ -294,13 +300,14 @@ int main(){
 		//((u.select(3).matrixMinues(u)).matrixMul(u.select(3).matrixMinues(u)))
 		temp0->select(3)->matrixMinues(*u);
 		temp0->matrixMul(*temp0);
-
+		//temp0->printMatrix();
 		//(u.select(1).matrixMinues(u.select(3)))
-		temp1->select(1)->matrixMinues(*(temp2->select(3)));
+		temp1->select(1)->matrixMinues(*(temp2->select(2)));
+		//temp2->printMatrix();
 		temp1->matrixMul(*(temp1));
-
+		//temp1->printMatrix();
 		(((temp0->matrixPlus(*(temp1->intMul(0.25))))->intPlus(MIN_ZERO))->matrixsqrt()->intDiv(1, 1))->copy(C3);
-		//C3.printMatrix();
+		//C3->printMatrix();
 
 
 		//C_4 = 1. / sqrt(eps + (u - u([1, 1:x_center - 1], :)). ^ 2 + 0.25*(u([1, 1:x_center - 1], [2:y_center, y_center]) - u([1, 1:x_center - 1], [1, 1:y_center - 1])). ^ 2);
@@ -318,14 +325,14 @@ int main(){
 		temp2->matrixMul(*temp2);
 
 		(((temp0->matrixPlus(*(temp2->intMul(0.25))))->intPlus(MIN_ZERO))->matrixsqrt()->intDiv(1, 1))->copy(C4);
-		//C4.printMatrix();
+		//C4->printMatrix();
 		//C=1+nu*m.*(C_1+C_2+C_3+C_4);
 		m->copy(temp0);
 		C1->copy(temp1);
 
 		((temp0->intMul(num)->dotMul(*(temp1->matrixPlus(*C2)->matrixPlus(*C3)->matrixPlus(*C4))))->intPlus(1.0))->copy(C);
 
-		
+		//C->printMatrix();
 		//update u
 		//
 		//u=(u+
@@ -349,6 +356,7 @@ int main(){
 		C2->copy(temp2);
 		C3->copy(temp3);
 		C4->copy(temp4);
+
 		temp1->dotMul(*(temp0->select(1)));
 		u->copy(temp0);
 		temp2->dotMul(*(temp0->select(2)));
@@ -356,28 +364,31 @@ int main(){
 		temp3->dotMul(*(temp0->select(3)));
 		u->copy(temp0);
 		temp4->dotMul(*(temp0->select(4)));
+		//temp4->printMatrix();
 		u->copy(temp0);
-		
-		temp0->matrixPlus(*((((temp1->matrixPlus(*(temp2)))->matrixPlus(*(temp3)))->matrixPlus(*(temp4))->dotMul(*m))->intMul(num)));
+		temp0->matrixPlus(*((((temp1->matrixPlus(*(temp2)))->matrixPlus(*(temp3)))->matrixPlus(*(temp4)))->dotMul(*m))->intMul(num));
+		//temp0->printMatrix();
 		m->copy(temp1);
-
 		imageArr.copy(temp2);
 		imageArr.copy(temp3);
 		//m.dotMul(imageArr.intMinus(c2).matrixMul(imageArr.intMinus(c2)))
 		(temp2->intMinus(c2));
 		temp2->matrixMul(*temp2);
-		temp3->intMul(c2);
+		//temp2->printMatrix();
+		temp3->intMinus(c1);
 		temp3->matrixMul(*temp3);
-		
-		temp1->dotMul(*(temp2->matrixMul(*temp3)));
-
+		//temp3->printMatrix();
+		temp2->matrixMinues(*temp3);
+		//temp2->printMatrix();
+		temp1->dotMul(*(temp2));
+		//temp1->printMatrix();
 		((temp0->matrixPlus(*temp1))->matrixDiv(*C))->copy(u);
-		//u.printMatrix();
-}
+		//u->printMatrix();
+	}
 
 
 
-	u->printMatrix();
+	//u->printMatrix();
 
 	//通过数组还原图片
 
@@ -418,12 +429,12 @@ int main(){
 						}
 					}
 				}
-				else if (j==width-1)//右
+				else if (j == width - 1)//右
 				{
 					//右上
 					if (i == 0)
 					{
-						if (u->getVal(i , j-1) <= 0 || u->getVal(i+1, j ) <= 0)
+						if (u->getVal(i, j - 1) <= 0 || u->getVal(i + 1, j) <= 0)
 						{
 							(*(imagedata + (height - 1 - i) * width + j)).blue = 0;
 							(*(imagedata + (height - 1 - i) * width + j)).green = 0;
@@ -432,7 +443,7 @@ int main(){
 					}
 					else if (i == height - 1)//右下
 					{
-						if (u->getVal(i-1, j) <= 0 || u->getVal(i, j-1) <= 0)
+						if (u->getVal(i - 1, j) <= 0 || u->getVal(i, j - 1) <= 0)
 						{
 							(*(imagedata + (height - 1 - i) * width + j)).blue = 0;
 							(*(imagedata + (height - 1 - i) * width + j)).green = 0;
@@ -441,27 +452,27 @@ int main(){
 					}
 					else//右中
 					{
-						if (u->getVal(i - 1, j) <= 0 || u->getVal(i, j-1) <= 0 || u->getVal(i+1, j) <= 0)
+						if (u->getVal(i - 1, j) <= 0 || u->getVal(i, j - 1) <= 0 || u->getVal(i + 1, j) <= 0)
 						{
 							(*(imagedata + (height - 1 - i) * width + j)).blue = 0;
 							(*(imagedata + (height - 1 - i) * width + j)).green = 0;
 							(*(imagedata + (height - 1 - i) * width + j)).red = 255;
 						}
 					}
-					
+
 				}
 				else//中间
 				{
-					if (i==0)//上
+					if (i == 0)//上
 					{
-						if (u->getVal(i, j-1) <= 0 || u->getVal(i, j + 1) <= 0 || u->getVal(i + 1, j) <= 0)
+						if (u->getVal(i, j - 1) <= 0 || u->getVal(i, j + 1) <= 0 || u->getVal(i + 1, j) <= 0)
 						{
 							(*(imagedata + (height - 1 - i) * width + j)).blue = 0;
 							(*(imagedata + (height - 1 - i) * width + j)).green = 0;
 							(*(imagedata + (height - 1 - i) * width + j)).red = 255;
 						}
 					}
-					else if (i==height-1)//下
+					else if (i == height - 1)//下
 					{
 						if (u->getVal(i, j - 1) <= 0 || u->getVal(i, j + 1) <= 0 || u->getVal(i - 1, j) <= 0)
 						{
@@ -472,7 +483,7 @@ int main(){
 					}
 					else//中
 					{
-						if (u->getVal(i, j - 1) <= 0 || u->getVal(i, j + 1) <= 0 || u->getVal(i + 1, j) <= 0 || u->getVal(i - 1, j) <= 0 )
+						if (u->getVal(i, j - 1) <= 0 || u->getVal(i, j + 1) <= 0 || u->getVal(i + 1, j) <= 0 || u->getVal(i - 1, j) <= 0)
 						{
 							(*(imagedata + (height - 1 - i) * width + j)).blue = 0;
 							(*(imagedata + (height - 1 - i) * width + j)).green = 0;
@@ -494,8 +505,8 @@ int main(){
 	fwrite(&bfType_w, 1, sizeof(WORD), fpw);
 	//fpw +=2;
 	fwrite(&strHead, 1, sizeof(tagBITMAPFILEHEADER), fpw);
-	strInfo.biWidth =  width;
-	strInfo.biHeight =  height;
+	strInfo.biWidth = width;
+	strInfo.biHeight = height;
 	fwrite(&strInfo, 1, sizeof(tagBITMAPINFOHEADER), fpw);
 	//保存调色板数据
 	for (unsigned int nCounti = 0; nCounti<strInfo.biClrUsed; nCounti++)
@@ -507,9 +518,9 @@ int main(){
 	}
 	//保存像素数据
 	int gray = 0;
-	for (int i = 0; i <  height; ++i)
+	for (int i = 0; i < height; ++i)
 	{
-		for (int j = 0; j <  width; ++j)
+		for (int j = 0; j < width; ++j)
 		{
 
 			fwrite(&((*(imagedata + i * width + j)).blue), 1, sizeof(BYTE), fpw);
@@ -518,7 +529,7 @@ int main(){
 		}
 	}
 	fclose(fpw);
-	
+
 	//释放内存
 	delete[] imagedata;
 	delete[] u_result;
